@@ -13,7 +13,7 @@ interface PageProps {
 }
 async function getArticle(slug: string) {
     try {
-        const res = await fetch(`http://localhost:3000/api/articles/${slug}`, { cache: 'no-store' });
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/articles/${slug}`, { cache: 'no-store' });
         const article = await res.json();
         return {
             ...article,

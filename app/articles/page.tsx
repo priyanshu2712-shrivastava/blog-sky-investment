@@ -15,7 +15,7 @@ const CATEGORIES = [
 
 async function getArticles(query: string = '', category?: string, trending?: boolean, page: number = 1) {
   try {
-    const getRes = await fetch(`http://localhost:3000/api/articles?q=${encodeURIComponent(query)}&${category ? "category=" + encodeURIComponent(category) : ""}&trending=${trending ? 'true' : 'false'}&page=${page}`, {
+    const getRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/articles?q=${encodeURIComponent(query)}&${category ? "category=" + encodeURIComponent(category) : ""}&trending=${trending ? 'true' : 'false'}&page=${page}`, {
     })
     const data = await getRes.json();
     return data;

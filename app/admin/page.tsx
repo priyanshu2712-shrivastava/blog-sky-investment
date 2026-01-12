@@ -14,7 +14,7 @@ const PAGE_SIZE = 10;
 async function getArticles(query: string = '', page: number = 1) {
   try {
     // const isAdmin = true; // Since this is admin dashboard
-    const getRes = await fetch(`http://localhost:3000/api/articles?admin=true&q=${encodeURIComponent(query)}&page=${page}`, {
+    const getRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/articles?admin=true&q=${encodeURIComponent(query)}&page=${page}`, {
     })
     const data = await getRes.json();
     return data;
