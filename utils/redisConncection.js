@@ -1,7 +1,7 @@
 import { Redis } from '@upstash/redis'
 export const redis = new Redis({
-  url: 'https://humble-python-31902.upstash.io',
-  token: 'AXyeAAIncDJiMjMwZWQ4Y2Y4MGQ0YzUyYmVjYzU4OGRjYjI4M2ZiY3AyMzE5MDI',
+  url: 'https://valid-dodo-24896.upstash.io',
+  token: 'AWFAAAIncDFlZDY2ZjEyNGE4Zjc0ZTAyOThlMjkzZjY4NjJlMDZlZXAxMjQ4OTY',
 })
 
 export async function testRedis() {

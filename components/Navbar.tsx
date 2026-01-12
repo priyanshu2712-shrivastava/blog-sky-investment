@@ -38,7 +38,7 @@ export default function Navbar() {
 
     // Check if on article/blog page or articles listing page
     const isArticlePage = pathname.startsWith('/blog/') || pathname.startsWith('/articles');
-    
+
     // Show About link only on home page (when not on article pages and not logged in)
     if (isArticlePage || session) {
         navLinks = navLinks.filter(link => link.name !== "About");
@@ -138,6 +138,17 @@ export default function Navbar() {
                             >
                                 Read Insights <ArrowRight size={16} />
                             </Link>
+                        )}
+                        {session && (
+                            <button
+                                onClick={() => {
+                                    setMobileMenuOpen(false);
+                                    signOut();
+                                }}
+                                className="flex justify-center items-center gap-2 bg-red-600 text-white px-5 py-3 rounded-xl text-base font-medium hover:bg-red-700 transition-colors"
+                            >
+                                Log out
+                            </button>
                         )}
                     </motion.div>
                 )}

@@ -3,6 +3,7 @@
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import ResizableImage from './extensions/ResizableImageExtension';
+import StyledParagraph from './extensions/StyledParagraph';
 import Placeholder from '@tiptap/extension-placeholder';
 import { TaskList } from '@tiptap/extension-task-list';
 import { TaskItem } from '@tiptap/extension-task-item';
@@ -21,7 +22,8 @@ import {
   Heading1, Heading2, Heading3, List, ListOrdered, Quote, Image as ImageIcon,
   LayoutGrid, BarChart as BarChartIcon, Undo, Redo, CheckSquare,
   AlignLeft, AlignCenter, AlignRight, AlignJustify, Highlighter,
-  Subscript as SubscriptIcon, Superscript as SuperscriptIcon, Plus, ChevronDown, DollarSign
+  Subscript as SubscriptIcon, Superscript as SuperscriptIcon, Plus, ChevronDown, DollarSign,
+  AlignVerticalSpaceAround
 } from 'lucide-react';
 import ChartExtension from './extensions/ChartExtension';
 import ChartModal from './ChartModal';
@@ -36,9 +38,11 @@ interface EditorProps {
 export default function Editor({ value, onChange }: EditorProps) {
   const [headingMenuOpen, setHeadingMenuOpen] = useState(false);
   const [currencyMenuOpen, setCurrencyMenuOpen] = useState(false);
+  const [lineSpacingMenuOpen, setLineSpacingMenuOpen] = useState(false);
   const [isChartModalOpen, setIsChartModalOpen] = useState(false);
   const headingMenuRef = useRef<HTMLDivElement>(null);
   const currencyMenuRef = useRef<HTMLDivElement>(null);
+  const lineSpacingMenuRef = useRef<HTMLDivElement>(null);
 
   const editor = useEditor({
     extensions: [
@@ -46,7 +50,9 @@ export default function Editor({ value, onChange }: EditorProps) {
         heading: {
           levels: [1, 2, 3],
         },
+        paragraph: false, // Disable default paragraph to use StyledParagraph
       }),
+      StyledParagraph,
       Placeholder.configure({
         placeholder: "Start typing...",
         includeChildren: true,
@@ -100,6 +106,9 @@ export default function Editor({ value, onChange }: EditorProps) {
       }
       if (currencyMenuRef.current && !currencyMenuRef.current.contains(event.target as Node)) {
         setCurrencyMenuOpen(false);
+      }
+      if (lineSpacingMenuRef.current && !lineSpacingMenuRef.current.contains(event.target as Node)) {
+        setLineSpacingMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -508,6 +517,59 @@ export default function Editor({ value, onChange }: EditorProps) {
                   >
                     <span className="font-medium w-5">{symbol}</span>
                     <span>{name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Line Spacing Dropdown */}
+          <div className="relative" ref={lineSpacingMenuRef}>
+            <button
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={(e) => {
+                e.preventDefault();
+                setLineSpacingMenuOpen(!lineSpacingMenuOpen);
+              }}
+              className="flex items-center gap-1 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 text-sm font-medium"
+              type="button"
+              title="Line Spacing"
+            >
+              <AlignVerticalSpaceAround size={14} />
+              <ChevronDown size={12} />
+            </button>
+            {lineSpacingMenuOpen && (
+              <div className="absolute top-full left-0 mt-1 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20 py-1 min-w-[120px]">
+                {[
+                  { value: '1', label: '1.0' },
+                  { value: '1.15', label: '1.15' },
+                  { value: '1.5', label: '1.5' },
+                  { value: '2', label: '2.0' },
+                  { value: '2.5', label: '2.5' },
+                  { value: '3', label: '3.0' },
+                ].map(({ value, label }) => (
+                  <button
+                    key={value}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => {
+                      setLineSpacingMenuOpen(false);
+                      // Apply line-height to all nodes in selection
+                      const { from, to } = editor.state.selection;
+                      editor.chain().focus().command(({ tr, state }) => {
+                        state.doc.nodesBetween(from, to, (node, pos) => {
+                          if (node.type.name === 'paragraph' || node.type.name === 'heading') {
+                            tr.setNodeMarkup(pos, undefined, {
+                              ...node.attrs,
+                              style: `line-height: ${value};`,
+                            });
+                          }
+                        });
+                        return true;
+                      }).run();
+                    }}
+                    className="w-full px-3 py-1.5 text-left text-sm text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
+                    {label}
                   </button>
                 ))}
               </div>

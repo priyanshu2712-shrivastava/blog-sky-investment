@@ -142,6 +142,68 @@ ul[data-type='taskList'] li>div {
   margin-bottom: 0.25rem;
 }
 
+/* Preserve empty paragraphs as spacing in editor and prose */
+.tiptap p:empty,
+.prose p:empty {
+  min-height: 1.5em;
+}
+
+/* Line Spacing Classes - MS Word Style */
+.line-spacing-1 {
+  line-height: 1 !important;
+}
+
+.line-spacing-115 {
+  line-height: 1.15 !important;
+}
+
+.line-spacing-15 {
+  line-height: 1.5 !important;
+}
+
+.line-spacing-2 {
+  line-height: 2 !important;
+}
+
+.line-spacing-25 {
+  line-height: 2.5 !important;
+}
+
+.line-spacing-3 {
+  line-height: 3 !important;
+}
+
+/* Apply line-spacing to prose paragraphs with data attribute */
+.prose p[data-line-spacing="1"],
+.tiptap p[data-line-spacing="1"] {
+  line-height: 1;
+}
+
+.prose p[data-line-spacing="1.15"],
+.tiptap p[data-line-spacing="1.15"] {
+  line-height: 1.15;
+}
+
+.prose p[data-line-spacing="1.5"],
+.tiptap p[data-line-spacing="1.5"] {
+  line-height: 1.5;
+}
+
+.prose p[data-line-spacing="2"],
+.tiptap p[data-line-spacing="2"] {
+  line-height: 2;
+}
+
+.prose p[data-line-spacing="2.5"],
+.tiptap p[data-line-spacing="2.5"] {
+  line-height: 2.5;
+}
+
+.prose p[data-line-spacing="3"],
+.tiptap p[data-line-spacing="3"] {
+  line-height: 3;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #171717;
