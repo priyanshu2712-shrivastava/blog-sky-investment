@@ -178,59 +178,58 @@ function InfoSection() {
             </p>
           </div>
 
-         {[
-  {
-    title: "Equities & Sectoral Opportunities",
-    text:
-      "Growth companies, emerging sector leaders, and business models driving earnings and scale.",
-    accent: "red",
-  },
-  {
-    title: "Commodities & Macro Trends",
-    text:
-      "Commodity cycles, demand–supply dynamics, and macro forces influencing prices and market sentiment.",
-    accent: "sky",
-  },
-  {
-    title: "Market Psychology",
-    text:
-      "Investor behaviour, trading psychology, and emotional patterns that shape decision-making in markets.",
-    accent: "indigo",
-  },
-  {
-    title: "Money, Risk & Financial Literacy",
-    text:
-      "Frameworks for managing risk, understanding money, and building clarity around long-term investing decisions.",
-    accent: "purple",
-  },
-].map(({ title, text, accent }) => {
-  // Define complete class names for each accent color with darker shades
-  const accentClasses = {
-    red: "hover:bg-gradient-to-br hover:from-red-500/30 hover:to-red-50 dark:hover:from-red-600/20 dark:hover:to-zinc-900",
-    sky: "hover:bg-gradient-to-br hover:from-sky-500/30 hover:to-sky-50 dark:hover:from-sky-600/20 dark:hover:to-zinc-900",
-    indigo: "hover:bg-gradient-to-br hover:from-indigo-500/30 hover:to-indigo-50 dark:hover:from-indigo-600/20 dark:hover:to-zinc-900",
-    purple: "hover:bg-gradient-to-br hover:from-purple-500/30 hover:to-purple-50 dark:hover:from-purple-600/20 dark:hover:to-zinc-900",
-  };
+          {([
+            {
+              title: "Equities & Sectoral Opportunities",
+              text:
+                "Growth companies, emerging sector leaders, and business models driving earnings and scale.",
+              accent: "red",
+            },
+            {
+              title: "Commodities & Macro Trends",
+              text:
+                "Commodity cycles, demand–supply dynamics, and macro forces influencing prices and market sentiment.",
+              accent: "sky",
+            },
+            {
+              title: "Market Psychology",
+              text:
+                "Investor behaviour, trading psychology, and emotional patterns that shape decision-making in markets.",
+              accent: "indigo",
+            },
+            {
+              title: "Money, Risk & Financial Literacy",
+              text:
+                "Frameworks for managing risk, understanding money, and building clarity around long-term investing decisions.",
+              accent: "purple",
+            },
+          ] as const).map(({ title, text, accent }) => {
+            const accentClasses = {
+              red: "hover:bg-gradient-to-br hover:from-red-500/30 hover:to-red-50 dark:hover:from-red-600/20 dark:hover:to-zinc-900",
+              sky: "hover:bg-gradient-to-br hover:from-sky-500/30 hover:to-sky-50 dark:hover:from-sky-600/20 dark:hover:to-zinc-900",
+              indigo: "hover:bg-gradient-to-br hover:from-indigo-500/30 hover:to-indigo-50 dark:hover:from-indigo-600/20 dark:hover:to-zinc-900",
+              purple: "hover:bg-gradient-to-br hover:from-purple-500/30 hover:to-purple-50 dark:hover:from-purple-600/20 dark:hover:to-zinc-900",
+            } as const;
 
-  return (
-    <div
-      key={title}
-      className={`
-        md:col-span-2 rounded-2xl border border-slate-200 p-6 backdrop-blur-md
-        grid-items
-        dark:border-zinc-800 dark:bg-zinc-900/50
-        ${accentClasses[accent]}
-      `}
-    >
-      <h3 className="font-semibold text-slate-900 dark:text-zinc-100">
-        {title}
-      </h3>
-      <p className="mt-2 text-sm text-slate-600 dark:text-zinc-400">
-        {text}
-      </p>
-    </div>
-  );
-})}
+            return (
+              <div
+                key={title}
+                className={`
+                  md:col-span-2 rounded-2xl border border-slate-200 p-6 backdrop-blur-md
+                  grid-items
+                  dark:border-zinc-800 dark:bg-zinc-900/50
+                  ${accentClasses[accent]}
+                `}
+              >
+                <h3 className="font-semibold text-slate-900 dark:text-zinc-100">
+                  {title}
+                </h3>
+                <p className="mt-2 text-sm text-slate-600 dark:text-zinc-400">
+                  {text}
+                </p>
+              </div>
+            );
+          })}
 
           {/* Wide card */}
           <div

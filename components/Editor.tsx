@@ -207,7 +207,7 @@ export default function Editor({ value, onChange }: EditorProps) {
     </button>
   );
 
-  const Divider = () => <div className="w-px h-5 bg-gray-200 mx-1" />;
+  const Divider = ({ className = "" }: { className?: string }) => <div className={`w-px h-5 bg-gray-200 mx-1 ${className}`} />;
 
   const getActiveHeading = () => {
     if (editor.isActive('heading', { level: 1 })) return 'H1';
