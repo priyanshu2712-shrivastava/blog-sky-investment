@@ -55,7 +55,7 @@ export default function Home() {
             </h1>
 
             <p className="mt-4 text-slate-600 w-full dark:text-zinc-400 text-start">
-              A stock market investor & trader with 5+ years of experience navigating
+              A stock market investor & trader(NISM Certified Research Analyst and Derivatives Trader) with 5+ years of experience navigating
               equities, commodities, and market cycles.
             </p>
 
