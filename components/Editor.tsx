@@ -91,6 +91,79 @@ export default function Editor({ value, onChange }: EditorProps) {
       attributes: {
         class: 'prose prose-lg max-w-none focus:outline-none min-h-[350px] prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline',
       },
+      // Handle pasted images - upload to Cloudinary instead of using base64
+      handlePaste: (view, event) => {
+        const items = event.clipboardData?.items;
+        if (!items) return false;
+
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          if (item.type.startsWith('image/')) {
+            event.preventDefault();
+            const file = item.getAsFile();
+            if (file) {
+              // Upload the image asynchronously
+              const formData = new FormData();
+              formData.append('file', file);
+              fetch('/api/upload', { method: 'POST', body: formData })
+                .then(res => {
+                  if (!res.ok) throw new Error('Upload failed');
+                  return res.json();
+                })
+                .then(data => {
+                  const { state, dispatch } = view;
+                  const node = state.schema.nodes.resizableImage.create({
+                    src: data.secure_url,
+                    alignment: 'center',
+                  });
+                  const transaction = state.tr.replaceSelectionWith(node);
+                  dispatch(transaction);
+                })
+                .catch(err => {
+                  console.error('Failed to upload pasted image:', err);
+                  alert('Failed to upload image');
+                });
+            }
+            return true;
+          }
+        }
+        return false;
+      },
+      // Handle dropped images - upload to Cloudinary instead of using base64
+      handleDrop: (view, event) => {
+        const files = event.dataTransfer?.files;
+        if (!files || files.length === 0) return false;
+
+        const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+        if (imageFiles.length === 0) return false;
+
+        event.preventDefault();
+
+        // Upload each image
+        imageFiles.forEach(file => {
+          const formData = new FormData();
+          formData.append('file', file);
+          fetch('/api/upload', { method: 'POST', body: formData })
+            .then(res => {
+              if (!res.ok) throw new Error('Upload failed');
+              return res.json();
+            })
+            .then(data => {
+              const { state, dispatch } = view;
+              const node = state.schema.nodes.resizableImage.create({
+                src: data.secure_url,
+                alignment: 'center',
+              });
+              const transaction = state.tr.replaceSelectionWith(node);
+              dispatch(transaction);
+            })
+            .catch(err => {
+              console.error('Failed to upload dropped image:', err);
+              alert('Failed to upload image');
+            });
+        });
+        return true;
+      },
     },
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());

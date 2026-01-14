@@ -37,12 +37,43 @@ export default function ArticleForm({ initialData }: ArticleFormProps) {
         isPublished: initialData?.isPublished ?? false, // Default false
     });
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const handleChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
 
         if (name === 'coverImage') {
             setLocalFileName(''); // Clear local filename when manual input occurs
-            setFormData(prev => ({ ...prev, coverImage: value }));
+
+            // Check if the pasted value is a base64 data URL
+            if (value.startsWith('data:image/')) {
+                setUploading(true);
+                try {
+                    // Convert base64 data URL to blob and upload to Cloudinary
+                    const response = await fetch(value);
+                    const blob = await response.blob();
+                    const file = new File([blob], 'pasted-image.png', { type: blob.type });
+
+                    const uploadData = new FormData();
+                    uploadData.append('file', file);
+
+                    const res = await fetch('/api/upload', {
+                        method: 'POST',
+                        body: uploadData,
+                    });
+
+                    if (!res.ok) throw new Error('Upload failed');
+
+                    const data = await res.json();
+                    setFormData(prev => ({ ...prev, coverImage: data.secure_url }));
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    alert('Failed to upload image. Please try uploading using the Browse button.');
+                    setFormData(prev => ({ ...prev, coverImage: '' }));
+                } finally {
+                    setUploading(false);
+                }
+            } else {
+                setFormData(prev => ({ ...prev, coverImage: value }));
+            }
         } else {
             const isCheckbox = type === 'checkbox';
             const val = isCheckbox ? (e.target as HTMLInputElement).checked : value;
@@ -170,7 +201,7 @@ export default function ArticleForm({ initialData }: ArticleFormProps) {
                             <input
                                 type="text"
                                 name="coverImage"
-                                value={localFileName || formData.coverImage}
+                                value={formData.coverImage}
                                 onChange={handleChange}
                                 placeholder="https://... or upload local image"
                                 className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-700 dark:text-gray-100"
