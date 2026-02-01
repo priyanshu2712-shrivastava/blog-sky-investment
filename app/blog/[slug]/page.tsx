@@ -7,6 +7,7 @@ import ReadingProgress from '@/components/ReadingProgress';
 import ReadTracker from '@/components/ReadTracker';
 import parse, { DOMNode, Element } from 'html-react-parser';
 import ChartComponent from '@/components/ChartComponent';
+import CommentSection from '@/components/CommentSection';
 
 interface PageProps {
     params: Promise<{ slug: string }>;
@@ -102,7 +103,11 @@ export default async function BlogPost({ params }: PageProps) {
                 <div className="prose prose-lg prose-slate prose-headings:font-serif prose-headings:font-bold max-w-none  dark:text-gray-100 text-gray-800">
                     {parse(article.content, parseOptions)}
                 </div>
+
+                {/* Comment Section */}
+                <CommentSection slug={slug} />
             </article>
         </>
     );
 }
+

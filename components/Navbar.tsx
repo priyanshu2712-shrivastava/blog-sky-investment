@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession, signOut, signIn } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
@@ -10,7 +10,8 @@ import { ThemeToggle } from './ThemeToggle';
 import Image from 'next/image';
 
 export default function Navbar() {
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
+    const isAdmin = (session?.user as { role?: string })?.role === 'admin';
     const pathname = usePathname();
     const [scrolled, setScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -44,7 +45,8 @@ export default function Navbar() {
         navLinks = navLinks.filter(link => link.name !== "About");
     }
 
-    if (session) {
+    // Only show Dashboard link for admin users
+    if (session && isAdmin) {
         navLinks.push({ name: 'Dashboard', href: '/admin' });
     }
 
@@ -89,14 +91,23 @@ export default function Navbar() {
                         </Link>
                     ))}
 
-                    {session &&
+                    {status === 'loading' ? (
+                        <span className="text-sm text-gray-400">...</span>
+                    ) : session ? (
                         <button
                             onClick={() => signOut()}
-                            className=" text-sm font-medium text-slate-600 hover:text-red-600 transition-colors"
+                            className="text-sm font-medium text-slate-600 hover:text-red-600 transition-colors"
                         >
                             Log out
                         </button>
-                    }
+                    ) : (
+                        <button
+                            onClick={() => signIn('google')}
+                            className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors"
+                        >
+                            Login
+                        </button>
+                    )}
                 </div>
                 <div className='flex gap-2'>
                     <ThemeToggle />
@@ -131,13 +142,15 @@ export default function Navbar() {
                             </Link>
                         ))}
                         {!session && (
-                            <Link
-                                href="/articles"
-                                onClick={() => setMobileMenuOpen(false)}
+                            <button
+                                onClick={() => {
+                                    setMobileMenuOpen(false);
+                                    signIn('google');
+                                }}
                                 className="flex justify-center items-center gap-2 bg-slate-900 text-white px-5 py-3 rounded-xl text-base font-medium"
                             >
-                                Read Insights <ArrowRight size={16} />
-                            </Link>
+                                Login <ArrowRight size={16} />
+                            </button>
                         )}
                         {session && (
                             <button

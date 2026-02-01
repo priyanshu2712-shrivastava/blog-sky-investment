@@ -13,33 +13,27 @@ export const authOptions: NextAuthOptions = {
         error: '/login',
     },
     callbacks: {
-        async signIn({ user }) {
-            // Server-side email restriction - CRITICAL SECURITY CHECK
-            const adminEmail = process.env.ADMIN_EMAIL;
-
-            if (!adminEmail) {
-                console.error('ADMIN_EMAIL not configured');
-                return false;
-            }
-
-            // Only allow the predefined admin email
-            if (user.email?.toLowerCase() === adminEmail.toLowerCase()) {
-                return true;
-            }
-
-            // Block all other emails
-            console.log(`Access denied for: ${user.email}`);
-            return false;
+        async signIn() {
+            // Allow all users to sign in via Google
+            return true;
         },
         async jwt({ token, user }) {
             if (user) {
-                token.role = 'admin';
+                const adminEmail = process.env.ADMIN_EMAIL;
+                // Assign role based on email - admin for matching email, user for others
+                token.role = user.email?.toLowerCase() === adminEmail?.toLowerCase() ? 'admin' : 'user';
+                token.email = user.email;
+                token.picture = user.image;
+                token.name = user.name;
             }
             return token;
         },
         async session({ session, token }) {
             if (session?.user) {
-                (session.user as { role?: string }).role = token.role as string;
+                (session.user as { role?: string; email?: string }).role = token.role as string;
+                session.user.email = token.email as string;
+                session.user.image = token.picture as string;
+                session.user.name = token.name as string;
             }
             return session;
         },

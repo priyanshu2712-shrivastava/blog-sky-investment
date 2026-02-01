@@ -26,10 +26,10 @@ function LoginContent() {
         <div className=" flex items-center justify-center h-screen w-full  px-6">
             <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-sm border border-gray-100">
                 <h1 className="text-2xl font-serif font-bold text-gray-900 mb-2 text-center">
-                    Admin Access
+                    Welcome to Sky Investment
                 </h1>
                 <p className="text-gray-500 text-sm text-center mb-6">
-                    Sign in to access the admin dashboard
+                    Sign in to join the conversation
                 </p>
 
                 {errorMessage && (
@@ -70,7 +70,7 @@ function LoginContent() {
 
                 <div className="mt-6 text-center">
                     <p className="text-xs text-gray-400">
-                        Only authorized administrators can access this area
+                        Sign in to comment on articles and join our community
                     </p>
                 </div>
             </div>

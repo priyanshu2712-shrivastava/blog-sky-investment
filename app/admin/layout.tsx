@@ -14,15 +14,14 @@ export default async function AdminLayout({
         redirect('/login');
     }
 
-    // Defense in depth: verify email matches admin email
-    const adminEmail = process.env.ADMIN_EMAIL;
-    if (session.user?.email?.toLowerCase() !== adminEmail?.toLowerCase()) {
+    // Defense in depth: verify user has admin role
+    if ((session.user as { role?: string })?.role !== 'admin') {
         redirect('/login?error=AccessDenied');
     }
 
     return (
         <div className="max-w-6xl mx-auto px-6 py-8">
-            
+
             {children}
         </div>
     );
