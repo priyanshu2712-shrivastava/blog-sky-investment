@@ -50,7 +50,7 @@ export async function PUT(
     }
 }
 
-// DELETE /api/comments/[id] - Delete a comment (owner only)
+// DELETE /api/comments/[id] - Delete a comment (owner or admin)
 export async function DELETE(
     request: Request,
     { params }: { params: Promise<{ id: string }> }
@@ -70,13 +70,16 @@ export async function DELETE(
             return NextResponse.json({ error: 'Comment not found' }, { status: 404 });
         }
 
-        // Check if the user is the owner of the comment
-        if (comment.userEmail !== session.user.email) {
+        // Check if the user is the owner or an admin
+        const isOwner = comment.userEmail === session.user.email;
+        const isAdmin = (session.user as { role?: string }).role === 'admin';
+
+        if (!isOwner && !isAdmin) {
             return NextResponse.json({ error: 'You can only delete your own comments' }, { status: 403 });
         }
 
-        // Delete the comment
-        await Comment.findByIdAndDelete(id);
+        // Delete the comment and all its replies
+        await Comment.deleteMany({ $or: [{ _id: id }, { parentId: id }] });
 
         return NextResponse.json({ message: 'Comment deleted successfully' });
     } catch (error) {
@@ -84,3 +87,4 @@ export async function DELETE(
         return NextResponse.json({ error: 'Failed to delete comment' }, { status: 500 });
     }
 }
+

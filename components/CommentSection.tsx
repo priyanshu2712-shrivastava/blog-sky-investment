@@ -14,6 +14,7 @@ interface Comment {
     content: string;
     createdAt: string;
     updatedAt: string;
+    parentId?: string | null;
 }
 
 interface CommentSectionProps {
@@ -110,6 +111,23 @@ export default function CommentSection({ slug }: CommentSectionProps) {
         setComments((prev) => prev.filter((c) => c._id !== id));
     };
 
+    const handleReply = async (parentId: string, content: string) => {
+        const res = await fetch('/api/comments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                articleSlug: slug,
+                content,
+                parentId,
+            }),
+        });
+
+        if (!res.ok) {
+            const data = await res.json();
+            throw new Error(data.error || 'Failed to post reply');
+        }
+    };
+
     return (
         <section className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-800">
             <h2 className="flex items-center gap-2 text-xl font-serif font-bold text-gray-900 dark:text-gray-100 mb-6">
@@ -203,8 +221,12 @@ export default function CommentSection({ slug }: CommentSectionProps) {
                             key={comment._id}
                             comment={comment}
                             currentUserEmail={session?.user?.email || undefined}
+                            isLoggedIn={!!session?.user}
+                            isAdmin={(session?.user as { role?: string })?.role === 'admin'}
+                            articleSlug={slug}
                             onEdit={handleEditComment}
                             onDelete={handleDeleteComment}
+                            onReply={handleReply}
                         />
                     ))}
                 </div>
@@ -217,3 +239,4 @@ export default function CommentSection({ slug }: CommentSectionProps) {
         </section>
     );
 }
+

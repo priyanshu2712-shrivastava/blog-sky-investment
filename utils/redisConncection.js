@@ -1,8 +1,9 @@
 import { Redis } from '@upstash/redis'
 export const redis = new Redis({
-  url: 'https://valid-dodo-24896.upstash.io',
-  token: 'AWFAAAIncDFlZDY2ZjEyNGE4Zjc0ZTAyOThlMjkzZjY4NjJlMDZlZXAxMjQ4OTY',
+  url: 'https://thankful-grubworm-68979.upstash.io',
+  token: 'gQAAAAAAAQ1zAAIncDI2OGQxMjMyZDUxMjk0NDliODc5ZDI1Y2Y3NjcwNWVmN3AyNjg5Nzk',
 })
+
 
 export async function testRedis() {
   try {

@@ -4,7 +4,7 @@ import Comment from '@/models/Comment';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
-// GET /api/comments?slug={articleSlug} - Fetch all comments for an article
+// GET /api/comments?slug={articleSlug} - Fetch all top-level comments for an article
 export async function GET(request: Request) {
     try {
         await dbConnect();
@@ -15,7 +15,8 @@ export async function GET(request: Request) {
             return NextResponse.json({ error: 'Article slug is required' }, { status: 400 });
         }
 
-        const comments = await Comment.find({ articleSlug: slug })
+        // Only fetch top-level comments (parentId is null)
+        const comments = await Comment.find({ articleSlug: slug, parentId: null })
             .sort({ createdAt: -1 })
             .lean();
 
@@ -26,7 +27,7 @@ export async function GET(request: Request) {
     }
 }
 
-// POST /api/comments - Create a new comment
+// POST /api/comments - Create a new comment or reply
 export async function POST(request: Request) {
     try {
         const session = await getServerSession(authOptions);
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
 
         await dbConnect();
         const body = await request.json();
-        const { articleSlug, content } = body;
+        const { articleSlug, content, parentId } = body;
 
         if (!articleSlug || !content) {
             return NextResponse.json({ error: 'Article slug and content are required' }, { status: 400 });
@@ -46,12 +47,21 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Comment is too long (max 2000 characters)' }, { status: 400 });
         }
 
+        // If parentId is provided, verify the parent comment exists
+        if (parentId) {
+            const parentComment = await Comment.findById(parentId);
+            if (!parentComment) {
+                return NextResponse.json({ error: 'Parent comment not found' }, { status: 404 });
+            }
+        }
+
         const comment = await Comment.create({
             articleSlug,
             userEmail: session.user.email ?? '',
             userName: session.user.name || 'Anonymous',
             userImage: session.user.image ?? undefined,
             content: content.trim(),
+            parentId: parentId || null,
         });
 
         return NextResponse.json(comment, { status: 201 });
